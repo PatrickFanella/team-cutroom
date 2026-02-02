@@ -1,161 +1,199 @@
 # 🎬 Cutroom
 
-> Collaborative short-form video production pipeline powered by AI agents.
+> **Collaborative short-form video production powered by AI agents.**
 
-Multiple specialized agents work together to create content: researcher → scriptwriter → voice synthesizer → music curator → visual sourcer → video editor → publisher. Each agent owns a stage — handoffs are structured, attribution is tracked, tokens are split on output.
+[![Tests](https://img.shields.io/badge/tests-151%20passing-brightgreen)](https://github.com/openwork-hackathon/team-cutroom)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Remotion](https://img.shields.io/badge/Remotion-video-purple)](https://remotion.dev/)
+
+Multiple specialized agents collaborate to create content. Each agent owns a stage, handoffs are structured, attribution is tracked, tokens are split on output.
 
 **Building the infrastructure for agent creative collaboration.**
 
-## 🎯 What We're Building
+---
 
-A pipeline system where:
+## ✨ Features
 
-1. **Topics flow in** — trending subjects, requests, scheduled content
-2. **Agents claim stages** — each stage has a specialized role
-3. **Work is handed off** — structured data passes between stages
-4. **Videos come out** — assembled, captioned, ready to publish
-5. **Attribution is tracked** — who contributed what, for token splits
+- **🔄 Pipeline Orchestration** — 7-stage production pipeline from research to publish
+- **🤖 Agent-Native** — Built for AI agents to claim, execute, and hand off work
+- **📊 Attribution Tracking** — Automatically track who contributed what
+- **🪙 Token Rewards** — $CUTROOM tokens distributed based on contribution weights
+- **🎥 Video Rendering** — React-based video composition with Remotion
+- **📱 Multi-Platform** — Publish to YouTube, TikTok, Twitter, Instagram
 
-### The Pipeline
+---
+
+## 🎯 How It Works
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │  Researcher  │ ──▶ │ Scriptwriter │ ──▶ │    Voice     │
-│   (facts)    │     │   (script)   │     │   (audio)    │
+│   (10%)      │     │   (25%)      │     │   (20%)      │
 └──────────────┘     └──────────────┘     └──────────────┘
                                                   │
         ┌─────────────────────────────────────────┘
         ▼
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │    Music     │ ──▶ │   Visuals    │ ──▶ │   Editor     │
-│   (track)    │     │  (b-roll)    │     │   (video)    │
+│   (10%)      │     │   (15%)      │     │   (15%)      │
 └──────────────┘     └──────────────┘     └──────────────┘
                                                   │
                                                   ▼
                                           ┌──────────────┐
                                           │  Publisher   │
-                                          │  (platform)  │
+                                          │   (5%)       │
                                           └──────────────┘
 ```
 
-## 🛠 Tech Stack
+1. **Topic comes in** — via API, dashboard, or scheduled
+2. **Agents claim stages** — check `/api/stages/available`, claim what you can do
+3. **Execute and hand off** — complete your stage, next agent picks up
+4. **Video rendered** — Remotion assembles all assets
+5. **Attribution recorded** — tokens distributed based on weights
 
-- **Frontend:** Next.js 14, React, Tailwind CSS
-- **Backend:** Next.js API Routes, Prisma ORM
-- **Database:** PostgreSQL (Vercel Postgres)
-- **Video Assembly:** Remotion (React-based video)
-- **Voice:** ElevenLabs API
-- **Storage:** Vercel Blob
-- **Chain:** Base (Mint Club V2 for token)
-
-## 👥 Team
-
-| Role | Agent | Specialty | Status |
-|------|-------|-----------|--------|
-| PM | Chora | Coordination, architecture | ✅ Active |
-| Frontend | *Recruiting* | React, UI/UX | 🔍 Open |
-| Backend | *Recruiting* | APIs, databases | 🔍 Open |
-| Contract | *Recruiting* | Solidity, tokenomics | 🔍 Open |
+---
 
 ## 🚀 Quick Start
 
 ```bash
+# Clone
 git clone https://github.com/openwork-hackathon/team-cutroom.git
 cd team-cutroom
+
+# Install
 pnpm install
+
+# Configure
 cp .env.example .env.local
+# Edit .env.local with your API keys
+
+# Database
+pnpm db:push
+
+# Run
 pnpm dev
 ```
 
-## 📋 Roadmap
+Visit [http://localhost:3000](http://localhost:3000) to see the dashboard.
 
-See [GitHub Issues](https://github.com/openwork-hackathon/team-cutroom/issues) for detailed breakdown.
+---
 
-### Epics
+## 📦 Scripts
 
-1. **🏗️ Core Infrastructure** — Pipeline state machine, database, API scaffold
-2. **🎭 Pipeline Stages** — Implement each stage (research → publish)
-3. **🎨 Frontend Dashboard** — UI to view pipelines, stages, outputs
-4. **🪙 Token Integration** — Mint Club token, attribution, payouts
-5. **🎬 Demo Production** — Create actual videos using the pipeline
-6. **📦 Polish & Submit** — Documentation, demo video, submission
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm test` | Run all tests (151 tests) |
+| `pnpm typecheck` | TypeScript type checking |
+| `pnpm pipeline:run "topic"` | Run full pipeline from CLI |
+| `pnpm video:render` | Render video from pipeline output |
+| `pnpm video:preview` | Preview video in Remotion Studio |
+| `pnpm deploy:token` | Deploy $CUTROOM token to Base |
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 14, React 18, Tailwind CSS |
+| **Backend** | Next.js API Routes, Prisma ORM |
+| **Database** | PostgreSQL (Vercel Postgres) |
+| **Video** | Remotion (React-based rendering) |
+| **Voice** | ElevenLabs API |
+| **Music** | Curated royalty-free tracks |
+| **Visuals** | Pexels API |
+| **Chain** | Base (Mint Club V2) |
+
+---
 
 ## 🪙 Token ($CUTROOM)
 
-**$CUTROOM** is a bonding curve token on Mint Club V2 (Base).
+$CUTROOM is a bonding curve token on Mint Club V2 (Base).
 
-- **Reserve Token:** $OPENWORK
-- **Max Supply:** 10,000,000 CUTROOM
-- **Royalties:** 1% mint, 1% burn → treasury
+| Property | Value |
+|----------|-------|
+| **Reserve Token** | $OPENWORK |
+| **Max Supply** | 10,000,000 CUTROOM |
+| **Mint Royalty** | 1% → Treasury |
+| **Burn Royalty** | 1% → Treasury |
 
-### Bonding Curve
+### Bonding Curve Pricing
 
-| Range | Price per CUTROOM |
-|-------|-------------------|
-| First 1M tokens | 0.001 OPENWORK |
-| Next 4M tokens | 0.005 OPENWORK |
-| Final 5M tokens | 0.01 OPENWORK |
-
-Early supporters get more tokens per OPENWORK. As the supply grows, the price increases.
+| Supply Range | Price per Token |
+|--------------|-----------------|
+| 0 - 1M | 0.001 OPENWORK |
+| 1M - 5M | 0.005 OPENWORK |
+| 5M - 10M | 0.01 OPENWORK |
 
 ### Attribution Weights
 
-When a pipeline completes, tokens are distributed to contributing agents:
-
-| Stage | Weight |
-|-------|--------|
-| Research | 10% |
-| Script | 25% |
-| Voice | 20% |
-| Music | 10% |
-| Visual | 15% |
-| Editor | 15% |
-| Publish | 5% |
-
-### Token Deployment
-
-```bash
-# Requires wallet with ETH on Base for gas
-BASE_RPC_URL=https://mainnet.base.org \
-DEPLOYER_PRIVATE_KEY=0x... \
-npm run deploy:token
-```
-
-## 🔗 Links
-
-- **Live Demo:** https://team-cutroom.vercel.app
-- **Token:** [Mint Club](https://mint.club) (after deployment)
-- **Hackathon:** https://www.openwork.bot/hackathon
+| Stage | Weight | Description |
+|-------|--------|-------------|
+| Research | 10% | Gather facts and sources |
+| Script | 25% | Write the video script |
+| Voice | 20% | Generate voiceover |
+| Music | 10% | Select background track |
+| Visual | 15% | Source b-roll clips |
+| Editor | 15% | Assemble final video |
+| Publish | 5% | Post to platforms |
 
 ---
 
 ## 📂 Project Structure
 
 ```
+cutroom/
 ├── src/
 │   ├── app/              # Next.js app router
+│   │   ├── api/          # REST API endpoints
+│   │   └── pipelines/    # Dashboard pages
 │   ├── components/       # React components
-│   ├── lib/
-│   │   ├── pipeline/     # Pipeline state machine
-│   │   ├── stages/       # Stage implementations
-│   │   └── db/           # Database client
-│   └── api/              # API routes
-├── prisma/
-│   └── schema.prisma     # Database schema
-├── public/               # Static assets
-└── remotion/             # Video composition
+│   └── lib/
+│       ├── pipeline/     # Pipeline state machine
+│       ├── stages/       # Stage handlers (7 stages)
+│       └── token/        # Token client & config
+├── remotion/             # Video composition
+├── scripts/              # CLI tools
+├── prisma/               # Database schema
+└── docs/                 # Documentation
 ```
-
-## 🤝 Contributing
-
-1. Check open issues for your role
-2. Assign yourself before starting
-3. Create a feature branch: `feat/[your-name]/[description]`
-4. Open a PR with clear description
-5. Tag relevant teammates for review
-
-**Commit convention:** `feat:`, `fix:`, `docs:`, `chore:`
 
 ---
 
-*Built with 🦞 by AI agents during the Openwork Clawathon*
+## 📖 Documentation
+
+- [API Reference](docs/API.md) — REST API endpoints
+- [Deployment Guide](docs/DEPLOYMENT.md) — How to deploy
+- [Contributing](CONTRIBUTING.md) — How to contribute
+
+---
+
+## 👥 Team
+
+| Role | Agent | Status |
+|------|-------|--------|
+| PM | Chora | ✅ Active |
+| All Development | Chora | ✅ Active |
+
+*Built solo by an AI agent during the Openwork Clawathon*
+
+---
+
+## 🔗 Links
+
+- **Repository:** [github.com/openwork-hackathon/team-cutroom](https://github.com/openwork-hackathon/team-cutroom)
+- **Hackathon:** [openwork.bot/hackathon](https://www.openwork.bot/hackathon)
+- **Mint Club:** [mint.club](https://mint.club)
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+*Built with 🦞 during the Openwork Clawathon*

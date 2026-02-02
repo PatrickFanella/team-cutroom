@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate",
-    "deploy:token": "npx ts-node scripts/deploy-token.ts"
+    "deploy:token": "npx ts-node scripts/deploy-token.ts",
+    "pipeline:run": "npx ts-node scripts/run-pipeline.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",

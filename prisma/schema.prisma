@@ -16,30 +16,48 @@ model Pipeline {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   stages       Stage[]
+  attributions Attribution[]
 
   @@index([status])
   @@index([createdAt])
 }
 
 model Stage {
-  id          String      @id @default(cuid())
-  pipelineId  String
-  name        StageName
-  status      StageStatus @default(PENDING)
-  agentId     String?
-  agentName   String?
-  input       Json?
-  output      Json?
-  artifacts   String[]    @default([])
-  error       String?
-  startedAt   DateTime?
-  completedAt DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  pipeline    Pipeline    @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  pipelineId   String
+  name         StageName
+  status       StageStatus   @default(PENDING)
+  agentId      String?
+  agentName    String?
+  input        Json?
+  output       Json?
+  artifacts    String[]      @default([])
+  error        String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  pipeline     Pipeline      @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  attributions Attribution[]
 
   @@unique([pipelineId, name])
   @@index([status])
+  @@index([agentId])
+}
+
+model Attribution {
+  id         String   @id @default(cuid())
+  pipelineId String
+  stageId    String
+  agentId    String
+  agentName  String
+  percentage Float    // Contribution percentage (0-100)
+  createdAt  DateTime @default(now())
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  stage    Stage    @relation(fields: [stageId], references: [id], onDelete: Cascade)
+
+  @@index([pipelineId])
   @@index([agentId])
 }
 

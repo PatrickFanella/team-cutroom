@@ -20,11 +20,10 @@ export const OPENWORK_TOKEN = {
   chain: 'base',
 } as const
 
-// CUTROOM token address will be set after deployment
-// Run: npm run deploy:token
+// CUTROOM token deployed via Clanker on Base
+// Deployed: 2026-02-02 by Kai via BankrBot
 export const CUTROOM_TOKEN = {
-  // TODO: Set after deployment
-  address: process.env.NEXT_PUBLIC_CUTROOM_TOKEN_ADDRESS || '',
+  address: process.env.NEXT_PUBLIC_CUTROOM_TOKEN_ADDRESS || '0x8ed4B9DE0F0aFe826c88FE0aeE484Df71D46aB07',
   symbol: 'CUTROOM',
   decimals: 18,
   chain: 'base',

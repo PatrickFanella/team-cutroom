@@ -36,7 +36,7 @@ const mockClaimedStages = [
     name: 'RESEARCH',
     agentId: 'agent-1',
     agentName: 'TestAgent',
-    claimedAt: new Date('2026-02-02T10:05:00Z'),
+    createdAt: new Date('2026-02-02T10:05:00Z'),
     pipeline: { topic: 'AI Trends' },
   },
 ]
@@ -56,9 +56,16 @@ describe('GET /api/activity', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(prisma.pipeline.findMany).mockResolvedValue(mockPipelines as any)
-    vi.mocked(prisma.stage.findMany)
-      .mockResolvedValueOnce(mockClaimedStages as any)
-      .mockResolvedValueOnce(mockCompletedStages as any)
+    // Mock both calls to stage.findMany
+    vi.mocked(prisma.stage.findMany).mockImplementation(async (args: any) => {
+      if (args?.where?.status === 'CLAIMED') {
+        return mockClaimedStages as any
+      }
+      if (args?.where?.status === 'COMPLETE') {
+        return mockCompletedStages as any
+      }
+      return []
+    })
   })
 
   it('returns activity feed', async () => {

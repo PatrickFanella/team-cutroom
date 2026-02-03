@@ -33,7 +33,7 @@ const mockPipeline = {
     { id: 's7', name: 'PUBLISH', status: 'PENDING', agentId: null, agentName: null },
   ],
   attributions: [
-    { agentId: 'a1', agentName: 'Agent1', stageName: 'RESEARCH', percentage: 10 },
+    { agentId: 'a1', agentName: 'Agent1', percentage: 10, stage: { name: 'RESEARCH' } },
   ],
 }
 

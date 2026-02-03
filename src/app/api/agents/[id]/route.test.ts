@@ -41,22 +41,22 @@ const mockAttributions = [
     agentId: 'agent-123',
     agentName: 'TestAgent',
     pipelineId: 'pipe-1',
-    stageName: 'RESEARCH',
     percentage: 10,
     claimed: false,
     createdAt: new Date('2026-02-01'),
     pipeline: { id: 'pipe-1', topic: 'AI Trends', status: 'COMPLETE' },
+    stage: { name: 'RESEARCH' },
   },
   {
     id: 'attr-2',
     agentId: 'agent-123',
     agentName: 'TestAgent',
     pipelineId: 'pipe-1',
-    stageName: 'SCRIPT',
     percentage: 25,
     claimed: false,
     createdAt: new Date('2026-02-01'),
     pipeline: { id: 'pipe-1', topic: 'AI Trends', status: 'COMPLETE' },
+    stage: { name: 'SCRIPT' },
   },
 ]
 
@@ -146,6 +146,6 @@ describe('GET /api/agents/[id]', () => {
 
     expect(data.attributions).toHaveLength(2)
     expect(data.attributions[0].percentage).toBe(10)
-    expect(data.attributions[0].claimed).toBe(false)
+    expect(data.attributions[0].stageName).toBe('RESEARCH')
   })
 })

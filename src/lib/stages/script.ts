@@ -20,6 +20,29 @@ const ScriptInputSchema = z.object({
   }),
   style: z.enum(["educational", "entertaining", "news", "tutorial"]).optional(),
   duration: z.number().optional(),
+  // Template-based inputs
+  structure: z.object({
+    format: z.enum(["monologue", "dialog", "story", "listicle", "tutorial", "debate"]).optional(),
+    pacing: z.object({
+      introDuration: z.number().optional(),
+      sectionGap: z.number().optional(),
+      outroDuration: z.number().optional(),
+      wordsPerMinute: z.number().optional(),
+    }).optional(),
+    hooks: z.object({
+      style: z.string().optional(),
+    }).optional(),
+    cta: z.object({
+      enabled: z.boolean().optional(),
+      text: z.string().optional(),
+    }).optional(),
+  }).optional(),
+  voice: z.object({
+    characters: z.array(z.object({
+      name: z.string(),
+      personality: z.string().optional(),
+    })).optional(),
+  }).optional(),
 })
 
 // LLM response schema for script generation
@@ -53,11 +76,18 @@ export const scriptStage: StageHandler = {
     try {
       // Get research from previous stage output or input
       const research = (context.previousOutput || context.input) as ResearchOutput
-      const style = (context.input as any).style || "educational"
-      const targetDuration = (context.input as any).duration || research.estimatedDuration || 60
+      const input = context.input as any
+      const style = input.style || "educational"
+      const targetDuration = input.duration || research.estimatedDuration || 60
+      
+      // Template structure config
+      const structure = input.structure || {}
+      const format = structure.format || "monologue"
+      const wordsPerMinute = structure.pacing?.wordsPerMinute || 150
+      const characters = input.voice?.characters || []
 
-      // Calculate word count (~150 words per minute)
-      const targetWords = Math.round((targetDuration / 60) * 150)
+      // Calculate word count based on template pacing
+      const targetWords = Math.round((targetDuration / 60) * wordsPerMinute)
 
       const apiKey = process.env.OPENAI_API_KEY
       let scriptData: z.infer<typeof LLMScriptResponseSchema>
@@ -65,15 +95,24 @@ export const scriptStage: StageHandler = {
 
       if (apiKey && !context.dryRun) {
         try {
-          const response = await callLLMForScript(research, style, targetDuration, apiKey)
+          const response = await callLLMForScript(
+            research, 
+            style, 
+            targetDuration, 
+            apiKey,
+            format,
+            characters,
+            structure.hooks?.style,
+            structure.cta
+          )
           scriptData = LLMScriptResponseSchema.parse(JSON.parse(response))
           modelUsed = "gpt-4o-mini"
         } catch (llmError) {
           console.warn("Script LLM call failed, using rule-based:", (llmError as Error).message)
-          scriptData = generateRuleBasedScript(research, targetDuration)
+          scriptData = generateRuleBasedScript(research, targetDuration, format, characters)
         }
       } else {
-        scriptData = generateRuleBasedScript(research, targetDuration)
+        scriptData = generateRuleBasedScript(research, targetDuration, format, characters)
       }
 
       // Create full script
@@ -97,9 +136,11 @@ export const scriptStage: StageHandler = {
         output,
         metadata: {
           style,
+          format,
           targetWords,
           actualWords: countWords(fullScript),
           model: modelUsed,
+          characterCount: characters.length,
         },
       }
     } catch (error) {
@@ -117,8 +158,53 @@ async function callLLMForScript(
   research: ResearchOutput,
   style: string,
   duration: number,
-  apiKey: string
+  apiKey: string,
+  format: string = "monologue",
+  characters: Array<{ name: string; personality?: string }> = [],
+  hookStyle?: string,
+  ctaConfig?: { enabled?: boolean; text?: string }
 ): Promise<string> {
+  // Build format-specific instructions
+  let formatInstructions = ""
+  
+  if (format === "dialog" && characters.length >= 2) {
+    formatInstructions = `
+FORMAT: Dialog between ${characters.length} characters
+Characters:
+${characters.map((c, i) => `- ${c.name}: ${c.personality || 'friendly'}`).join("\n")}
+
+Each section should be a single character's line. Alternate between characters naturally.
+Include the speaker name in each section heading.`
+  } else if (format === "story") {
+    formatInstructions = `
+FORMAT: Narrative story
+Write in a storytelling style with a clear beginning, middle, and end.
+Use descriptive language and create atmosphere.`
+  } else if (format === "listicle") {
+    formatInstructions = `
+FORMAT: Listicle
+Present information as a numbered list of points.
+Each point should be punchy and memorable.`
+  } else if (format === "debate" && characters.length >= 2) {
+    formatInstructions = `
+FORMAT: Debate between ${characters[0]?.name || 'Character A'} and ${characters[1]?.name || 'Character B'}
+Present opposing viewpoints. Each character argues their position passionately but respectfully.
+Include counter-arguments.`
+  } else {
+    formatInstructions = `
+FORMAT: Monologue
+Single narrator presenting information directly to the viewer.
+Keep it conversational and engaging.`
+  }
+
+  const hookInstruction = hookStyle 
+    ? `Hook style: ${hookStyle} (e.g., start with a ${hookStyle})` 
+    : "Choose the most attention-grabbing hook"
+
+  const ctaInstruction = ctaConfig?.enabled === false 
+    ? "End naturally without a call to action" 
+    : `End with: "${ctaConfig?.text || 'Follow for more!'}"`
+
   const prompt = `Create a video script for a ${duration}-second ${style} short-form video.
 
 Topic: ${research.topic}
@@ -129,12 +215,15 @@ ${research.facts.map((f, i) => `${i + 1}. ${f}`).join("\n")}
 Hook Options:
 ${research.hooks.map((h, i) => `${i + 1}. ${h}`).join("\n")}
 
+${formatInstructions}
+
 Guidelines:
-- Choose or improve the best hook for grabbing attention
+- ${hookInstruction}
 - Create ${Math.ceil(duration / 15)} sections (~15 sec each)
 - Each section should have a visual cue for b-roll selection
-- End with a compelling call to action
+- ${ctaInstruction}
 - Include 3-4 speaker notes for delivery
+${format === "dialog" || format === "debate" ? "- Include speaker name in each section heading (e.g., 'Character A: Question')" : ""}
 
 Respond with ONLY valid JSON (no markdown) in this exact structure:
 {
@@ -175,8 +264,13 @@ Respond with ONLY valid JSON (no markdown) in this exact structure:
 }
 
 // Rule-based fallback script generation
-function generateRuleBasedScript(research: ResearchOutput, duration: number): z.infer<typeof LLMScriptResponseSchema> {
-  const sections = generateSections(research.facts, research.topic, duration)
+function generateRuleBasedScript(
+  research: ResearchOutput, 
+  duration: number,
+  format: string = "monologue",
+  characters: Array<{ name: string; personality?: string }> = []
+): z.infer<typeof LLMScriptResponseSchema> {
+  const sections = generateSections(research.facts, research.topic, duration, format, characters)
   return {
     hook: research.hooks[0] || `Let's talk about ${research.topic}`,
     sections,
@@ -189,16 +283,32 @@ function generateRuleBasedScript(research: ResearchOutput, duration: number): z.
   }
 }
 
-function generateSections(facts: string[], topic: string, duration: number): ScriptSection[] {
+function generateSections(
+  facts: string[], 
+  topic: string, 
+  duration: number,
+  format: string = "monologue",
+  characters: Array<{ name: string }> = []
+): ScriptSection[] {
   const numSections = Math.min(facts.length, Math.ceil(duration / 15)) // ~15 sec per section
   const sectionDuration = Math.round(duration / numSections)
 
-  return facts.slice(0, numSections).map((fact, i) => ({
-    heading: `Point ${i + 1}`,
-    content: fact,
-    visualCue: generateVisualCue(fact, topic),
-    duration: sectionDuration,
-  }))
+  return facts.slice(0, numSections).map((fact, i) => {
+    let heading = `Point ${i + 1}`
+    
+    // For dialog/debate formats, assign speakers
+    if ((format === "dialog" || format === "debate") && characters.length >= 2) {
+      const speaker = characters[i % characters.length]
+      heading = `${speaker.name}: ${heading}`
+    }
+    
+    return {
+      heading,
+      content: fact,
+      visualCue: generateVisualCue(fact, topic),
+      duration: sectionDuration,
+    }
+  })
 }
 
 function generateVisualCue(fact: string, topic: string): string {

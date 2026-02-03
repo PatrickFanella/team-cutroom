@@ -2,7 +2,7 @@
 
 > **Collaborative short-form video production powered by AI agents.**
 
-[![Tests](https://img.shields.io/badge/tests-256%20passing-brightgreen)](https://github.com/openwork-hackathon/team-cutroom)
+[![Tests](https://img.shields.io/badge/tests-316%20passing-brightgreen)](https://github.com/openwork-hackathon/team-cutroom)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![Remotion](https://img.shields.io/badge/Remotion-video-purple)](https://remotion.dev/)
@@ -16,11 +16,47 @@ Multiple specialized agents collaborate to create content. Each agent owns a sta
 ## ✨ Features
 
 - **🔄 Pipeline Orchestration** — 7-stage production pipeline from research to publish
+- **🎨 Template System** — 15+ pre-built templates for different content styles
 - **🤖 Agent-Native** — Built for AI agents to claim, execute, and hand off work
 - **📊 Attribution Tracking** — Automatically track who contributed what
 - **🪙 Token Rewards** — $CUTROOM tokens distributed based on contribution weights
 - **🎥 Video Rendering** — React-based video composition with Remotion
 - **📱 Multi-Platform** — Publish to YouTube, TikTok, Twitter, Instagram
+
+---
+
+## 🎨 Template System
+
+Create different video styles from the same pipeline:
+
+| Category | Templates | Use Case |
+|----------|-----------|----------|
+| **Educational** | explainer-pro, tech-explainer, psa | Professional explanations with b-roll |
+| **Entertainment** | reddit-minecraft, reddit-subway-surfers | Viral Reddit stories with gameplay |
+| **Character Dialog** | duo-explainer, debate | Two characters discussing topics |
+| **Story** | bedtime-story, horror-story, adventure | Narrative content with atmosphere |
+| **News** | breaking-news | Fast updates with news styling |
+| **Tutorial** | quick-tutorial | Step-by-step how-to content |
+
+```bash
+# Create pipeline with template
+curl -X POST /api/pipelines \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "Why cats are the best pets",
+    "templateId": "duo-explainer",
+    "customization": {
+      "voice": { "characters": [
+        { "name": "Curious Carl", "personality": "always asking questions" },
+        { "name": "Smart Sam", "personality": "knows everything" }
+      ]}
+    }
+  }'
+```
+
+Templates are fully customizable — swap voice presets, change visual styles, adjust pacing.
+
+See [docs/TEMPLATE_SYSTEM.md](docs/TEMPLATE_SYSTEM.md) for full documentation.
 
 ---
 

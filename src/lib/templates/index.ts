@@ -9,3 +9,6 @@ export * from './types'
 
 // Presets
 export * from './presets'
+
+// Remotion integration
+export * from './remotion'

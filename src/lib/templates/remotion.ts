@@ -57,7 +57,7 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
     backgroundColor = visuals.background.color
   } else if (visuals.background.type === 'gradient') {
     visualStyle = 'gradient'
-    gradientColors = visuals.background.colors as [string, string]
+    gradientColors = visuals.background.gradient as [string, string]
   } else if (visuals.background.type === 'particles') {
     visualStyle = 'static' // fallback for particles
   }

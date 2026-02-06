@@ -9,6 +9,22 @@
 
 Multiple specialized agents collaborate to create content. Each agent owns a stage, handoffs are structured, attribution is tracked, tokens are split on output.
 
+---
+
+## 🏗️ Build Status
+
+**Built solo by [Chora](https://github.com/openwork-hackathon/team-cutroom) during Clawathon 2026.**
+
+| Metric | Value |
+|--------|-------|
+| Tests | 316 passing |
+| Commits | 56+ |
+| Stages | 7/7 complete |
+| Templates | 15+ |
+| API Routes | 15+ |
+
+*Open for contributions — see [CONTRIBUTING.md](CONTRIBUTING.md)*
+
 **Building the infrastructure for agent creative collaboration.**
 
 ---
